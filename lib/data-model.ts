@@ -63,13 +63,16 @@ export const UNIFIED_DATA: SubsystemData[] = [
       estado: "activo",
     },
     cilindros: {
-      total: 187094,
+      // Ajustado para coincidir con la suma de sonSubsistemas (58296 + 23454 + 57206 = 138956)
+      total: 138956,
       llenos: 86666,
       vacios: 16788,
       mantencion: 35640,
       competencia: 48000,
-      operativos: 151454,
-      eficiencia: 80.9,
+      // Recalculado: 138956 - 35640 - 48000 = 55316
+      operativos: 55316,
+      // Recalculado: (55316 / 138956) * 100 = 39.8
+      eficiencia: 39.8,
     },
     masa: {
       totalMasa: 88.4,
@@ -84,11 +87,19 @@ export const UNIFIED_DATA: SubsystemData[] = [
       },
     },
     formatos: {
-      "5k": { cilindros: 45000, masa: 22.5, conteoFisico: 3773, progMasa: 1550 },
-      "11k": { cilindros: 35000, masa: 38.5, conteoFisico: 3500, progMasa: 2500 },
-      "15k": { cilindros: 48000, masa: 72.0, conteoFisico: 7300, progMasa: 6400 },
-      "45k": { cilindros: 32000, masa: 144.0, conteoFisico: 1307, progMasa: 1400 },
-      GH: { cilindros: 27094, masa: 24.3, conteoFisico: 530, progMasa: 650 },
+      // 5k: 45000 * 5 / 1000 = 225.0. Original: 22.5. Corregido.
+      "5k": { cilindros: 45000, masa: 225.0, conteoFisico: 3773, progMasa: 1550 },
+      // 11k: 35000 * 11 / 1000 = 385.0. Original: 38.5. Corregido.
+      "11k": { cilindros: 35000, masa: 385.0, conteoFisico: 3500, progMasa: 2500 },
+      // 15k: 48000 * 15 / 1000 = 720.0. Original: 72.0. Corregido.
+      "15k": { cilindros: 48000, masa: 720.0, conteoFisico: 7300, progMasa: 6400 },
+      // 45k: 32000 * 45 / 1000 = 1440.0. Original: 144.0. Corregido.
+      "45k": { cilindros: 32000, masa: 1440.0, conteoFisico: 1307, progMasa: 1400 },
+      // GH: 27094 * 10 / 1000 = 270.94 (asumiendo GH = 10kg). Original: 24.3. Corregido asumiendo 10kg.
+      // Si GH representa un peso diferente, este cálculo debe ajustarse.
+      // Para que masa sea 24.3, y cilindros 27094, el peso sería 24.3 * 1000 / 27094 = 0.896 kg.
+      // Decido mantener el número de cilindros y ajustar la masa según un peso supuesto de 10kg para GH.
+      GH: { cilindros: 27094, masa: 270.9, conteoFisico: 530, progMasa: 650 },
     },
     sonSubsistemas: [
       { name: "SS1 Despacho", total: 58296, llenos: 28710, vacios: 4374, otros: 25212, masa: 32.8 },
@@ -111,8 +122,10 @@ export const UNIFIED_DATA: SubsystemData[] = [
       vacios: 8955,
       mantencion: 5000,
       competencia: 5000,
-      operativos: 30743,
-      eficiencia: 86.0,
+      // Calculado: 35743 - 5000 - 5000 = 25743
+      operativos: 25743,
+      // Calculado: (25743 / 35743) * 100 = 72.0
+      eficiencia: 72.0,
     },
     masa: {
       totalMasa: 35.7,
@@ -127,11 +140,16 @@ export const UNIFIED_DATA: SubsystemData[] = [
       },
     },
     formatos: {
-      "5k": { cilindros: 8000, masa: 4.0, conteoFisico: 3773, progMasa: 1550 },
-      "11k": { cilindros: 7000, masa: 7.7, conteoFisico: 3500, progMasa: 2500 },
-      "15k": { cilindros: 10000, masa: 15.0, conteoFisico: 5400, progMasa: 5100 },
-      "45k": { cilindros: 6000, masa: 27.0, conteoFisico: 1345, progMasa: 1400 },
-      GH: { cilindros: 4743, masa: 4.3, conteoFisico: 530, progMasa: 650 },
+      // 5k: 8000 * 5 / 1000 = 40.0. Original: 4.0. Corregido.
+      "5k": { cilindros: 8000, masa: 40.0, conteoFisico: 3773, progMasa: 1550 },
+      // 11k: 7000 * 11 / 1000 = 77.0. Original: 7.7. Corregido.
+      "11k": { cilindros: 7000, masa: 77.0, conteoFisico: 3500, progMasa: 2500 },
+      // 15k: 10000 * 15 / 1000 = 150.0. Original: 15.0. Corregido.
+      "15k": { cilindros: 10000, masa: 150.0, conteoFisico: 5400, progMasa: 5100 },
+      // 45k: 6000 * 45 / 1000 = 270.0. Original: 27.0. Corregido.
+      "45k": { cilindros: 6000, masa: 270.0, conteoFisico: 1345, progMasa: 1400 },
+      // GH: 4743 * 10 / 1000 = 47.43 (asumiendo GH = 10kg). Original: 4.3. Corregido.
+      GH: { cilindros: 4743, masa: 47.4, conteoFisico: 530, progMasa: 650 },
     },
     sonSubsistemas: [
       { name: "SS1 Norte", total: 15000, llenos: 8000, vacios: 3500, otros: 3500, masa: 15.2 },
@@ -153,8 +171,10 @@ export const UNIFIED_DATA: SubsystemData[] = [
       vacios: 8000,
       mantencion: 4500,
       competencia: 4000,
-      operativos: 24000,
-      eficiencia: 84.2,
+      // Calculado: 28500 - 4500 - 4000 = 20000
+      operativos: 20000,
+      // Calculado: (20000 / 28500) * 100 = 70.2
+      eficiencia: 70.2,
     },
     masa: {
       totalMasa: 28.5,
@@ -169,11 +189,16 @@ export const UNIFIED_DATA: SubsystemData[] = [
       },
     },
     formatos: {
-      "5k": { cilindros: 6000, masa: 3.0, conteoFisico: 3773, progMasa: 1550 },
-      "11k": { cilindros: 5500, masa: 6.1, conteoFisico: 3500, progMasa: 2500 },
-      "15k": { cilindros: 8000, masa: 12.0, conteoFisico: 6400, progMasa: 6100 },
-      "45k": { cilindros: 5000, masa: 22.5, conteoFisico: 1340, progMasa: 1400 },
-      GH: { cilindros: 4000, masa: 3.6, conteoFisico: 530, progMasa: 650 },
+      // 5k: 6000 * 5 / 1000 = 30.0. Original: 3.0. Corregido.
+      "5k": { cilindros: 6000, masa: 30.0, conteoFisico: 3773, progMasa: 1550 },
+      // 11k: 5500 * 11 / 1000 = 60.5. Original: 6.1. Corregido.
+      "11k": { cilindros: 5500, masa: 60.5, conteoFisico: 3500, progMasa: 2500 },
+      // 15k: 8000 * 15 / 1000 = 120.0. Original: 12.0. Corregido.
+      "15k": { cilindros: 8000, masa: 120.0, conteoFisico: 6400, progMasa: 6100 },
+      // 45k: 5000 * 45 / 1000 = 225.0. Original: 22.5. Corregido.
+      "45k": { cilindros: 5000, masa: 225.0, conteoFisico: 1340, progMasa: 1400 },
+      // GH: 4000 * 10 / 1000 = 40.0 (asumiendo GH = 10kg). Original: 3.6. Corregido.
+      GH: { cilindros: 4000, masa: 40.0, conteoFisico: 530, progMasa: 650 },
     },
     sonSubsistemas: [
       { name: "SS1 Central", total: 15000, llenos: 6500, vacios: 4000, otros: 4500, masa: 15.1 },
@@ -230,8 +255,10 @@ export const UNIFIED_DATA: SubsystemData[] = [
       vacios: 12000,
       mantencion: 6500,
       competencia: 5000,
-      operativos: 36000,
-      eficiencia: 85.7,
+      // Calculado: 42000 - 6500 - 5000 = 30500
+      operativos: 30500,
+      // Calculado: (30500 / 42000) * 100 = 72.6
+      eficiencia: 72.6,
     },
     masa: {
       totalMasa: 42.0,
@@ -246,11 +273,16 @@ export const UNIFIED_DATA: SubsystemData[] = [
       },
     },
     formatos: {
-      "5k": { cilindros: 9000, masa: 4.5, conteoFisico: 3773, progMasa: 1550 },
-      "11k": { cilindros: 8000, masa: 8.8, conteoFisico: 3500, progMasa: 2500 },
-      "15k": { cilindros: 12000, masa: 18.0, conteoFisico: 6400, progMasa: 6100 },
-      "45k": { cilindros: 8000, masa: 36.0, conteoFisico: 1340, progMasa: 1400 },
-      GH: { cilindros: 5000, masa: 4.5, conteoFisico: 530, progMasa: 650 },
+      // 5k: 9000 * 5 / 1000 = 45.0. Original: 4.5. Corregido.
+      "5k": { cilindros: 9000, masa: 45.0, conteoFisico: 3773, progMasa: 1550 },
+      // 11k: 8000 * 11 / 1000 = 88.0. Original: 8.8. Corregido.
+      "11k": { cilindros: 8000, masa: 88.0, conteoFisico: 3500, progMasa: 2500 },
+      // 15k: 12000 * 15 / 1000 = 180.0. Original: 18.0. Corregido.
+      "15k": { cilindros: 12000, masa: 180.0, conteoFisico: 6400, progMasa: 6100 },
+      // 45k: 8000 * 45 / 1000 = 360.0. Original: 36.0. Corregido.
+      "45k": { cilindros: 8000, masa: 360.0, conteoFisico: 1340, progMasa: 1400 },
+      // GH: 5000 * 10 / 1000 = 50.0 (asumiendo GH = 10kg). Original: 4.5. Corregido.
+      GH: { cilindros: 5000, masa: 50.0, conteoFisico: 530, progMasa: 650 },
     },
     sonSubsistemas: [
       { name: "SS1 Principal", total: 25000, llenos: 11000, vacios: 7000, otros: 7000, masa: 25.2 },
