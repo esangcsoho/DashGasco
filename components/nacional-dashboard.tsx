@@ -126,14 +126,14 @@ export function NacionalDashboard() {
         {/* Navegación principal con filtros */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
-                        <Button
+                <Button
               variant={activeSection === "overview" ? "default" : "outline"}
-              size="sm"
+                  size="sm"
               onClick={() => setActiveSection("overview")}
-            >
+                >
               <Map className="w-4 h-4 mr-2" />
               Overview SGP
-            </Button>
+                </Button>
             <ArrowRight className="w-4 h-4 text-gray-400" />
                 <Button
               variant={activeSection === "cilindros" ? "default" : "outline"}
