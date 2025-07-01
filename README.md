@@ -36,11 +36,10 @@ DashGasco es un dashboard ejecutivo desarrollado para **GASCO** que proporciona 
 ```
 📁 components/
 ├── 📄 nacional-dashboard.tsx      # Controlador principal (200 líneas)
-├── 📁 sections/                   # Componentes modulares
-│   ├── 📄 overview-section.tsx   # Resumen Nacional
-│   ├── 📄 materia-section.tsx    # Materia Prima  
-│   ├── 📄 cilindros-section.tsx  # Análisis Cilindros
-│   └── 📄 masa-section.tsx       # Gestión Masa
+  ├── 📁 sections/                   # Componentes modulares
+  │   ├── 📄 materia-section.tsx    # Resumen Nacional Materia Prima
+  │   ├── 📄 cilindros-section.tsx  # Análisis Cilindros
+  │   └── 📄 masa-section.tsx       # Gestión Masa
 └── 📁 ui/                         # Componentes base
     ├── 📄 tremor-card.tsx         # Cards mejoradas
     ├── 📄 tremor-progress.tsx     # Indicadores circulares
@@ -49,25 +48,20 @@ DashGasco es un dashboard ejecutivo desarrollado para **GASCO** que proporciona 
 
 ## 🎯 Secciones del Dashboard
 
-### 1. 📊 **Resumen Nacional**
+### 1. 📊 **Resumen Nacional Materia Prima**
 - Mapa interactivo de subsistemas con estados
-- KPIs principales: Subsistemas, Cilindros, Eficiencia
-- Vista expandible de detalles por subsistema
-- Filtros: Solo Activos, Tiempo Real
-
-### 2. 🏭 **Materia Prima**
-- Distribución por subsistemas con gráficos circulares
-- Resumen por producto general con gráfico de barras
+- KPIs principales: Subsistemas, Cilindros, Eficiencia 
+- Resumen por producto general con stock SGP vs SAP
 - Comparativo SGP vs SAP con alertas automáticas
-- Indicadores de alineación entre sistemas
+- Vista expandible de detalles por subsistema
 
-### 3. 🔄 **Análisis de Cilindros**
+### 2. 🔄 **Análisis de Cilindros**
 - Resumen operativo por categorías (Llenos, Vacíos, Mantencion, Competencia)
 - Stock inicial por subsistemas con visualización en grid 3x3
 - Tablas de desglose expandibles ("Ver Detalle")
 - Clasificación por formatos (5K, 11K, 15K, 45K, Mix)
 
-### 4. ⚖️ **Gestión de Masa**
+### 3. ⚖️ **Gestión de Masa**
 - Vista ejecutiva consolidada para monitoreo gerencial
 - Matriz de masa por Planta × Formato × Estado
 - KPIs críticos y distribución por categorías
@@ -93,11 +87,8 @@ DashGasco es un dashboard ejecutivo desarrollado para **GASCO** que proporciona 
 
 ## 📸 Capturas de Pantalla
 
-### Resumen Nacional
-![Resumen Nacional](public/images/propuesta.png)
-
-### Materia Prima
-![Materia Prima](public/images/materia.png)
+### Resumen Nacional Materia Prima
+![Resumen Nacional Materia Prima](public/images/materia.png)
 
 ### Análisis de Cilindros  
 ![Cilindros](public/images/cilindros.png)

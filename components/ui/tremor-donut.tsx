@@ -41,8 +41,8 @@ export function DonutChart({ data, className }: DonutChartProps) {
       </svg>
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="text-center">
-          <div className="text-2xl font-bold">{total.toLocaleString()}</div>
-          <div className="text-sm text-gray-500">Total</div>
+          <div className="text-lg font-bold text-gray-800">{(total / 1000).toFixed(1)}k</div>
+          <div className="text-xs text-gray-500">cil</div>
         </div>
       </div>
     </div>

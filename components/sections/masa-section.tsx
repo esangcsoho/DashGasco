@@ -3,6 +3,7 @@
 import React from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { NATIONAL_TOTALS } from "@/lib/data-model"
 import Image from "next/image"
 
 interface MasaSectionProps {
@@ -35,19 +36,10 @@ export function MasaSection({ masaPorPlantaYFormato }: MasaSectionProps) {
   return (
     <div className="h-[calc(100vh-200px)] overflow-hidden">
       {/* Header específico para Masa - siguiendo @masa.png */}
-      <div className="bg-gradient-to-r from-green-600 to-green-700 p-6 rounded-lg shadow-lg mb-4">
-        <div className="flex items-center justify-between text-white">
-          <div className="flex items-center gap-4">
-            <Image src="/images/gasco-logo.png" alt="GASCO Logo" width={100} height={32} className="h-8 w-auto brightness-0 invert" />
-            <div className="border-l border-green-300 pl-4">
-              <h2 className="text-2xl font-bold">Resumen de Cilindros Operativos Respecto de Masa Optima</h2>
-              <p className="text-green-100">Gestión Nacional de Masa</p>
-            </div>
-          </div>
-          <div className="text-right">
-            <div className="text-sm text-green-200">Vista consolidada</div>
-            <div className="text-lg font-semibold">Resumen De Masa por Cilindros</div>
-          </div>
+      <div className="bg-gray-100 border-b border-gray-300 p-3 mb-4">
+        <div className="flex items-center gap-4">
+          <Image src="/images/gasco-logo.png" alt="GASCO Logo" width={50} height={16} className="h-4 w-auto" />
+          <h2 className="text-base font-semibold text-gray-700">Gestión de Masa</h2>
         </div>
       </div>
 

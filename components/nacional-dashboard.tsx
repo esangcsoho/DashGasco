@@ -10,7 +10,6 @@ import { UNIFIED_DATA, NATIONAL_TOTALS } from "@/lib/data-model"
 import Image from "next/image"
 
 // Importar las secciones modulares
-import { OverviewSection } from "./sections/overview-section"
 import { MateriaSection } from "./sections/materia-section"
 import { CilindrosSection } from "./sections/cilindros-section"
 import { MasaSection } from "./sections/masa-section"
@@ -122,65 +121,45 @@ export function NacionalDashboard() {
   return (
     <TooltipProvider>
       <div className="min-h-screen bg-gray-50 p-6">
-        {/* Header principal del dashboard */}
-        <div className="mb-6 bg-gradient-to-r from-blue-50 to-gray-50 p-4 rounded-lg border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Image src="/images/gasco-logo.png" alt="GASCO Logo" width={80} height={26} className="h-6 w-auto" />
-              <div>
-                <h1 className="text-xl font-bold text-gray-800">Dashboard Nacional SGP</h1>
-                <p className="text-sm text-gray-600">Sistema Integrado de Gestión de Procesos</p>
-              </div>
-            </div>
-          </div>
-        </div>
+
 
         {/* Navegación principal con filtros */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
-            <Button
+                        <Button
               variant={activeSection === "overview" ? "default" : "outline"}
               size="sm"
               onClick={() => setActiveSection("overview")}
             >
               <Map className="w-4 h-4 mr-2" />
-              Resumen Nacional
+              Overview SGP
             </Button>
             <ArrowRight className="w-4 h-4 text-gray-400" />
-            <Button
-              variant={activeSection === "materia" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setActiveSection("materia")}
-            >
-              <BarChart3 className="w-4 h-4 mr-2" />
-              Materia Prima
-            </Button>
-            <ArrowRight className="w-4 h-4 text-gray-400" />
-            <Button
+                <Button
               variant={activeSection === "cilindros" ? "default" : "outline"}
-              size="sm"
+                  size="sm"
               onClick={() => setActiveSection("cilindros")}
-            >
+                >
               <Activity className="w-4 h-4 mr-2" />
               Análisis Cilindros
-            </Button>
+                </Button>
             <ArrowRight className="w-4 h-4 text-gray-400" />
-            <Button
+                <Button
               variant={activeSection === "masa" ? "default" : "outline"}
-              size="sm"
+                  size="sm"
               onClick={() => setActiveSection("masa")}
-            >
+                >
               <Gauge className="w-4 h-4 mr-2" />
               Gestión Masa
-            </Button>
-          </div>
+                </Button>
+              </div>
           <div className="flex items-center gap-4">
-            <TremorToggle
+                <TremorToggle
               label="Solo Activos"
               checked={showOnlyActive}
               onCheckedChange={(checked) => setShowOnlyActive(checked)}
-            />
-            <TremorToggle
+                />
+                <TremorToggle
               label="Tiempo Real"
               checked={realTimeData}
               onCheckedChange={(checked) => setRealTimeData(checked)}
@@ -191,25 +170,16 @@ export function NacionalDashboard() {
                 En vivo
               </Badge>
             )}
-          </div>
+              </div>
         </div>
 
         {/* Renderizado condicional de las secciones */}
-        {activeSection === "overview" && (
-          <OverviewSection
+                {activeSection === "overview" && (
+          <MateriaSection 
             nationalOverview={nationalOverview}
             filteredData={filteredData}
             expandedSubsystem={expandedSubsystem}
             toggleSubsystem={toggleSubsystem}
-            getStatusColor={getStatusColor}
-          />
-        )}
-
-        {activeSection === "materia" && (
-          <MateriaSection
-            nationalOverview={nationalOverview}
-            comparativoSGPvsSAP={comparativoSGPvsSAP}
-            filteredData={filteredData}
             getStatusColor={getStatusColor}
           />
         )}
@@ -229,4 +199,4 @@ export function NacionalDashboard() {
       </div>
     </TooltipProvider>
   )
-} 
+}

@@ -368,3 +368,75 @@ export const calculateNationalTotals = () => {
 }
 
 export const NATIONAL_TOTALS = calculateNationalTotals()
+
+// Datos adicionales para storytelling maestro
+export const MASTER_INSIGHTS = {
+  // Stock Inicial (SAP) vs SGP para accuracy
+  stockComparison: {
+    stockInicial: {
+      llenos: 66200,
+      vacios: 32800,
+      mantencion: 18200,
+      competencia: 13800,
+      total: 131000,
+    },
+    stockSGP: {
+      llenos: NATIONAL_TOTALS.cilindros.llenos,
+      vacios: NATIONAL_TOTALS.cilindros.vacios,
+      mantencion: NATIONAL_TOTALS.cilindros.mantencion,
+      competencia: NATIONAL_TOTALS.cilindros.competencia,
+      total: NATIONAL_TOTALS.cilindros.total,
+    },
+    differences: {
+      llenos: NATIONAL_TOTALS.cilindros.llenos - 66200,
+      vacios: NATIONAL_TOTALS.cilindros.vacios - 32800,
+      mantencion: NATIONAL_TOTALS.cilindros.mantencion - 18200,
+      competencia: NATIONAL_TOTALS.cilindros.competencia - 13800,
+      total: NATIONAL_TOTALS.cilindros.total - 131000,
+    },
+    accuracyRate: Math.round(((131000 - Math.abs(NATIONAL_TOTALS.cilindros.total - 131000)) / 131000) * 100 * 10) / 10,
+  },
+  
+  // Distribución por tamaños para storytelling
+  cilindrosBySize: {
+    "5kg": { 
+      cantidad: 89100, 
+      porcentaje: 64.3, 
+      capacidadDisponible: 95000,
+      ocupacion: Math.round((89100 / 95000) * 100)
+    },
+    "11kg": { 
+      cantidad: 24900, 
+      porcentaje: 18.0, 
+      capacidadDisponible: 28000,
+      ocupacion: Math.round((24900 / 28000) * 100)
+    },
+    "15kg": { 
+      cantidad: 15500, 
+      porcentaje: 11.2, 
+      capacidadDisponible: 18000,
+      ocupacion: Math.round((15500 / 18000) * 100)
+    },
+    "45kg": { 
+      cantidad: 6200, 
+      porcentaje: 4.5, 
+      capacidadDisponible: 8000,
+      ocupacion: Math.round((6200 / 8000) * 100)
+    },
+    "GH": { 
+      cantidad: 2800, 
+      porcentaje: 2.0, 
+      capacidadDisponible: 4000,
+      ocupacion: Math.round((2800 / 4000) * 100)
+    },
+  },
+  
+  // KPIs críticos para performance
+  criticalKPIs: {
+    eficienciaMeta: 95,
+    gapEficiencia: 95 - NATIONAL_TOTALS.eficienciaNacional,
+    subsistemaCritico: UNIFIED_DATA.filter(s => s.materiaPrima.estado === "inactivo").length,
+    cilindrosMantencionPct: Math.round((NATIONAL_TOTALS.cilindros.mantencion / NATIONAL_TOTALS.cilindros.total) * 100 * 10) / 10,
+    capacidadDisponible: NATIONAL_TOTALS.materiaPrima.capacidad - NATIONAL_TOTALS.materiaPrima.toneladas,
+  }
+}
