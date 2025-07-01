@@ -179,6 +179,49 @@ Los datos se encuentran en `lib/data-model.ts`:
 - `UNIFIED_DATA` - Información por subsistema
 - `NATIONAL_TOTALS` - Totales consolidados nacionales
 
+## 🔗 Integración con BigQuery y Looker
+
+### **Fuente de Datos Real**
+
+El dashboard Gasco se alimenta de las siguientes vistas de BigQuery:
+
+- **Resumen Materia Prima:**  
+  `datos-procesados-gasco.stock_operacional_qa.view_resumen_materiaprima`
+  - Nivel de agregación: nacional, por subsistema, por planta, por producto
+  - Campos clave: producto, subsistema, planta, stock SGP/SAP, capacidad
+
+- **Detalle Materia Prima por Estanque:**  
+  `datos-procesados-gasco.stock_operacional_qa.view_detalle_materiaprima_estanque`
+  - Nivel de detalle: estanque, batería, subsistema, producto, presión, temperatura, densidad, stock, capacidad
+
+### **Looks recomendados en Looker**
+
+- **Cards de resumen nacional y por subsistema**
+- **Tablas y gráficos de breakdown por producto, planta, subsistema**
+- **Detalle por estanque y batería**
+- **Comparativos SGP vs SAP**
+- **Visualización de competencia**
+- **Drilldown desde nacional → subsistema → estanque**
+
+### **Modelo de datos alineado**
+
+El modelo de datos del dashboard está diseñado para mapear 1:1 los resultados de estas vistas, asegurando consistencia y escalabilidad.  
+Todos los totales nacionales y breakdowns se calculan sumando los datos de los subsistemas/productos/formatos provenientes de BigQuery.
+
+### **Ejemplo de mapeo**
+
+- **Producto:** `material_group_description`
+- **Subsistema:** `subsystems_description`
+- **Stock SGP/SAP:** `StockSgp`, `StockSap`
+- **Capacidad:** `nominal_capacity` o `CapacidadEstanque`
+- **Formato:** (si se puede inferir de batería/estanque)
+
+---
+
+**¿Cómo se actualiza el dashboard?**  
+Cada vez que se actualizan las vistas en BigQuery, los Looks en Looker y el dashboard Gasco reflejan automáticamente los nuevos datos, manteniendo la integridad y consistencia del modelo.
+
+
 ## 📊 Métricas y Performance
 
 ### **Optimizaciones Implementadas**

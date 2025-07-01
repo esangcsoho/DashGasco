@@ -1,57 +1,68 @@
 // Modelo de datos unificado para consistencia across todas las vistas
-export interface SubsystemData {
-  id: string
-  name: string
-  // Datos de Materia Prima
-  materiaPrima: {
-    toneladas: number
-    ocupacion: number // %
-    capacidad: number
-    estado: "activo" | "inactivo"
-  }
-  // Datos de Cilindros
-  cilindros: {
-    total: number
-    llenos: number
-    vacios: number
-    mantencion: number
-    competencia: number
-    operativos: number
-    eficiencia: number // %
-  }
-  // Datos de Masa
-  masa: {
-    totalMasa: number // Toneladas
-    masaOperativa: number
-    masaDisponible: number
-    masaMantenimiento: number
-    densidadPromedio: number // kg/cilindro
-    flujo: {
-      entrada: number // Ton/día
-      salida: number
-      neto: number
-    }
-  }
-  // Análisis por formato
-  formatos: {
-    "5k": { cilindros: number; masa: number; conteoFisico: number; progMasa: number }
-    "11k": { cilindros: number; masa: number; conteoFisico: number; progMasa: number }
-    "15k": { cilindros: number; masa: number; conteoFisico: number; progMasa: number }
-    "45k": { cilindros: number; masa: number; conteoFisico: number; progMasa: number }
-    GH: { cilindros: number; masa: number; conteoFisico: number; progMasa: number }
-  }
-  // Son Subsistemas
-  sonSubsistemas: Array<{
-    name: string
-    total: number
-    llenos: number
-    vacios: number
-    otros: number
-    masa: number
-  }>
+
+// Tipos de producto posibles
+export type TipoProducto = "Propano SC" | "Propano" | "Mezcla" | "Butano" | "Competencia";
+
+// Formatos de cilindro posibles
+export type FormatoCilindro = "5k" | "11k" | "15k" | "45k" | "GH";
+
+export interface ProductoMateriaPrima {
+  nombre: TipoProducto;
+  porcentaje: number; // del total de materia prima del subsistema
+  toneladas?: number; // calculado dinámicamente
 }
 
-// Datos maestros unificados
+export interface FormatoDetalle {
+  cilindros: number;
+  masa: number;
+  conteoFisico: number;
+  progMasa: number;
+  competencia?: number; // cantidad de cilindros de competencia en este formato
+}
+
+export interface SubsystemData {
+  id: string;
+  name: string;
+  materiaPrima: {
+    toneladas: number;
+    ocupacion: number;
+    capacidad: number;
+    estado: "activo" | "inactivo";
+    productos: ProductoMateriaPrima[]; // Incluye competencia
+  };
+  cilindros: {
+    total: number;
+    llenos: number;
+    vacios: number;
+    mantencion: number;
+    competencia: number;
+    operativos: number;
+    eficiencia: number;
+    porFormato: Record<FormatoCilindro, FormatoDetalle>;
+  };
+  masa: {
+    totalMasa: number;
+    masaOperativa: number;
+    masaDisponible: number;
+    masaMantenimiento: number;
+    densidadPromedio: number;
+    flujo: {
+      entrada: number;
+      salida: number;
+      neto: number;
+    };
+  };
+  sonSubsistemas: Array<{
+    name: string;
+    total: number;
+    llenos: number;
+    vacios: number;
+    otros: number;
+    masa: number;
+  }>;
+}
+
+// Ejemplo de datos (puedes expandir para todos los subsistemas)
 export const UNIFIED_DATA: SubsystemData[] = [
   {
     id: "maipu",
@@ -61,6 +72,13 @@ export const UNIFIED_DATA: SubsystemData[] = [
       ocupacion: 48,
       capacidad: 2410,
       estado: "activo",
+      productos: [
+        { nombre: "Propano SC", porcentaje: 0.40 },
+        { nombre: "Propano", porcentaje: 0.25 },
+        { nombre: "Mezcla", porcentaje: 0.20 },
+        { nombre: "Butano", porcentaje: 0.10 },
+        { nombre: "Competencia", porcentaje: 0.05 },
+      ],
     },
     cilindros: {
       total: 187094,
@@ -70,6 +88,13 @@ export const UNIFIED_DATA: SubsystemData[] = [
       competencia: 48000,
       operativos: 151454,
       eficiencia: 80.9,
+      porFormato: {
+        "5k": { cilindros: 45000, masa: 22.5, conteoFisico: 3773, progMasa: 1550, competencia: 5000 },
+        "11k": { cilindros: 35000, masa: 38.5, conteoFisico: 3500, progMasa: 2500, competencia: 8000 },
+        "15k": { cilindros: 48000, masa: 72.0, conteoFisico: 7300, progMasa: 6400, competencia: 12000 },
+        "45k": { cilindros: 32000, masa: 144.0, conteoFisico: 1307, progMasa: 1400, competencia: 18000 },
+        "GH": { cilindros: 27094, masa: 24.3, conteoFisico: 530, progMasa: 650, competencia: 6000 },
+      },
     },
     masa: {
       totalMasa: 88.4,
@@ -82,13 +107,6 @@ export const UNIFIED_DATA: SubsystemData[] = [
         salida: 6.8,
         neto: 1.6,
       },
-    },
-    formatos: {
-      "5k": { cilindros: 45000, masa: 22.5, conteoFisico: 3773, progMasa: 1550 },
-      "11k": { cilindros: 35000, masa: 38.5, conteoFisico: 3500, progMasa: 2500 },
-      "15k": { cilindros: 48000, masa: 72.0, conteoFisico: 7300, progMasa: 6400 },
-      "45k": { cilindros: 32000, masa: 144.0, conteoFisico: 1307, progMasa: 1400 },
-      GH: { cilindros: 27094, masa: 24.3, conteoFisico: 530, progMasa: 650 },
     },
     sonSubsistemas: [
       { name: "SS1 Despacho", total: 58296, llenos: 28710, vacios: 4374, otros: 25212, masa: 32.8 },
@@ -104,6 +122,12 @@ export const UNIFIED_DATA: SubsystemData[] = [
       ocupacion: 84,
       capacidad: 243,
       estado: "activo",
+      productos: [
+        { nombre: "Propano SC", porcentaje: 0.48 },
+        { nombre: "Propano", porcentaje: 0.30 },
+        { nombre: "Mezcla", porcentaje: 0.16 },
+        { nombre: "Butano", porcentaje: 0.06 },
+      ],
     },
     cilindros: {
       total: 35743,
@@ -113,6 +137,13 @@ export const UNIFIED_DATA: SubsystemData[] = [
       competencia: 5000,
       operativos: 30743,
       eficiencia: 86.0,
+      porFormato: {
+        "5k": { cilindros: 8000, masa: 4.0, conteoFisico: 3773, progMasa: 1550, competencia: 5000 },
+        "11k": { cilindros: 7000, masa: 7.7, conteoFisico: 3500, progMasa: 2500, competencia: 8000 },
+        "15k": { cilindros: 10000, masa: 15.0, conteoFisico: 5400, progMasa: 5100, competencia: 10000 },
+        "45k": { cilindros: 6000, masa: 27.0, conteoFisico: 1345, progMasa: 1400, competencia: 10000 },
+        "GH": { cilindros: 4743, masa: 4.3, conteoFisico: 530, progMasa: 650, competencia: 5000 },
+      },
     },
     masa: {
       totalMasa: 35.7,
@@ -125,13 +156,6 @@ export const UNIFIED_DATA: SubsystemData[] = [
         salida: 2.8,
         neto: 0.4,
       },
-    },
-    formatos: {
-      "5k": { cilindros: 8000, masa: 4.0, conteoFisico: 3773, progMasa: 1550 },
-      "11k": { cilindros: 7000, masa: 7.7, conteoFisico: 3500, progMasa: 2500 },
-      "15k": { cilindros: 10000, masa: 15.0, conteoFisico: 5400, progMasa: 5100 },
-      "45k": { cilindros: 6000, masa: 27.0, conteoFisico: 1345, progMasa: 1400 },
-      GH: { cilindros: 4743, masa: 4.3, conteoFisico: 530, progMasa: 650 },
     },
     sonSubsistemas: [
       { name: "SS1 Norte", total: 15000, llenos: 8000, vacios: 3500, otros: 3500, masa: 15.2 },
@@ -146,6 +170,12 @@ export const UNIFIED_DATA: SubsystemData[] = [
       ocupacion: 44,
       capacidad: 357,
       estado: "activo",
+      productos: [
+        { nombre: "Propano SC", porcentaje: 0.48 },
+        { nombre: "Propano", porcentaje: 0.30 },
+        { nombre: "Mezcla", porcentaje: 0.16 },
+        { nombre: "Butano", porcentaje: 0.06 },
+      ],
     },
     cilindros: {
       total: 28500,
@@ -155,6 +185,13 @@ export const UNIFIED_DATA: SubsystemData[] = [
       competencia: 4000,
       operativos: 24000,
       eficiencia: 84.2,
+      porFormato: {
+        "5k": { cilindros: 6000, masa: 3.0, conteoFisico: 3773, progMasa: 1550, competencia: 5000 },
+        "11k": { cilindros: 5500, masa: 6.1, conteoFisico: 3500, progMasa: 2500, competencia: 8000 },
+        "15k": { cilindros: 8000, masa: 12.0, conteoFisico: 6400, progMasa: 6100, competencia: 10000 },
+        "45k": { cilindros: 5000, masa: 22.5, conteoFisico: 1340, progMasa: 1400, competencia: 10000 },
+        "GH": { cilindros: 4000, masa: 3.6, conteoFisico: 530, progMasa: 650, competencia: 5000 },
+      },
     },
     masa: {
       totalMasa: 28.5,
@@ -167,13 +204,6 @@ export const UNIFIED_DATA: SubsystemData[] = [
         salida: 1.8,
         neto: 0.3,
       },
-    },
-    formatos: {
-      "5k": { cilindros: 6000, masa: 3.0, conteoFisico: 3773, progMasa: 1550 },
-      "11k": { cilindros: 5500, masa: 6.1, conteoFisico: 3500, progMasa: 2500 },
-      "15k": { cilindros: 8000, masa: 12.0, conteoFisico: 6400, progMasa: 6100 },
-      "45k": { cilindros: 5000, masa: 22.5, conteoFisico: 1340, progMasa: 1400 },
-      GH: { cilindros: 4000, masa: 3.6, conteoFisico: 530, progMasa: 650 },
     },
     sonSubsistemas: [
       { name: "SS1 Central", total: 15000, llenos: 6500, vacios: 4000, otros: 4500, masa: 15.1 },
@@ -188,6 +218,7 @@ export const UNIFIED_DATA: SubsystemData[] = [
       ocupacion: 0,
       capacidad: 500,
       estado: "inactivo",
+      productos: [],
     },
     cilindros: {
       total: 0,
@@ -197,6 +228,7 @@ export const UNIFIED_DATA: SubsystemData[] = [
       competencia: 0,
       operativos: 0,
       eficiencia: 0,
+      porFormato: {},
     },
     masa: {
       totalMasa: 0,
@@ -205,13 +237,6 @@ export const UNIFIED_DATA: SubsystemData[] = [
       masaMantenimiento: 0,
       densidadPromedio: 0,
       flujo: { entrada: 0, salida: 0, neto: 0 },
-    },
-    formatos: {
-      "5k": { cilindros: 0, masa: 0, conteoFisico: 0, progMasa: 0 },
-      "11k": { cilindros: 0, masa: 0, conteoFisico: 0, progMasa: 0 },
-      "15k": { cilindros: 0, masa: 0, conteoFisico: 0, progMasa: 0 },
-      "45k": { cilindros: 0, masa: 0, conteoFisico: 0, progMasa: 0 },
-      GH: { cilindros: 0, masa: 0, conteoFisico: 0, progMasa: 0 },
     },
     sonSubsistemas: [],
   },
@@ -223,6 +248,12 @@ export const UNIFIED_DATA: SubsystemData[] = [
       ocupacion: 56,
       capacidad: 795,
       estado: "activo",
+      productos: [
+        { nombre: "Propano SC", porcentaje: 0.48 },
+        { nombre: "Propano", porcentaje: 0.30 },
+        { nombre: "Mezcla", porcentaje: 0.16 },
+        { nombre: "Butano", porcentaje: 0.06 },
+      ],
     },
     cilindros: {
       total: 42000,
@@ -232,6 +263,13 @@ export const UNIFIED_DATA: SubsystemData[] = [
       competencia: 5000,
       operativos: 36000,
       eficiencia: 85.7,
+      porFormato: {
+        "5k": { cilindros: 9000, masa: 4.5, conteoFisico: 3773, progMasa: 1550, competencia: 5000 },
+        "11k": { cilindros: 8000, masa: 8.8, conteoFisico: 3500, progMasa: 2500, competencia: 8000 },
+        "15k": { cilindros: 12000, masa: 18.0, conteoFisico: 6400, progMasa: 6100, competencia: 10000 },
+        "45k": { cilindros: 8000, masa: 36.0, conteoFisico: 1340, progMasa: 1400, competencia: 10000 },
+        "GH": { cilindros: 5000, masa: 4.5, conteoFisico: 530, progMasa: 650, competencia: 5000 },
+      },
     },
     masa: {
       totalMasa: 42.0,
@@ -244,13 +282,6 @@ export const UNIFIED_DATA: SubsystemData[] = [
         salida: 3.2,
         neto: 0.6,
       },
-    },
-    formatos: {
-      "5k": { cilindros: 9000, masa: 4.5, conteoFisico: 3773, progMasa: 1550 },
-      "11k": { cilindros: 8000, masa: 8.8, conteoFisico: 3500, progMasa: 2500 },
-      "15k": { cilindros: 12000, masa: 18.0, conteoFisico: 6400, progMasa: 6100 },
-      "45k": { cilindros: 8000, masa: 36.0, conteoFisico: 1340, progMasa: 1400 },
-      GH: { cilindros: 5000, masa: 4.5, conteoFisico: 530, progMasa: 650 },
     },
     sonSubsistemas: [
       { name: "SS1 Principal", total: 25000, llenos: 11000, vacios: 7000, otros: 7000, masa: 25.2 },
@@ -265,6 +296,7 @@ export const UNIFIED_DATA: SubsystemData[] = [
       ocupacion: 0,
       capacidad: 300,
       estado: "inactivo",
+      productos: [],
     },
     cilindros: {
       total: 0,
@@ -274,6 +306,7 @@ export const UNIFIED_DATA: SubsystemData[] = [
       competencia: 0,
       operativos: 0,
       eficiencia: 0,
+      porFormato: {},
     },
     masa: {
       totalMasa: 0,
@@ -282,13 +315,6 @@ export const UNIFIED_DATA: SubsystemData[] = [
       masaMantenimiento: 0,
       densidadPromedio: 0,
       flujo: { entrada: 0, salida: 0, neto: 0 },
-    },
-    formatos: {
-      "5k": { cilindros: 0, masa: 0, conteoFisico: 0, progMasa: 0 },
-      "11k": { cilindros: 0, masa: 0, conteoFisico: 0, progMasa: 0 },
-      "15k": { cilindros: 0, masa: 0, conteoFisico: 0, progMasa: 0 },
-      "45k": { cilindros: 0, masa: 0, conteoFisico: 0, progMasa: 0 },
-      GH: { cilindros: 0, masa: 0, conteoFisico: 0, progMasa: 0 },
     },
     sonSubsistemas: [],
   },
@@ -300,6 +326,7 @@ export const UNIFIED_DATA: SubsystemData[] = [
       ocupacion: 0,
       capacidad: 200,
       estado: "inactivo",
+      productos: [],
     },
     cilindros: {
       total: 0,
@@ -309,6 +336,7 @@ export const UNIFIED_DATA: SubsystemData[] = [
       competencia: 0,
       operativos: 0,
       eficiencia: 0,
+      porFormato: {},
     },
     masa: {
       totalMasa: 0,
@@ -318,56 +346,70 @@ export const UNIFIED_DATA: SubsystemData[] = [
       densidadPromedio: 0,
       flujo: { entrada: 0, salida: 0, neto: 0 },
     },
-    formatos: {
-      "5k": { cilindros: 0, masa: 0, conteoFisico: 0, progMasa: 0 },
-      "11k": { cilindros: 0, masa: 0, conteoFisico: 0, progMasa: 0 },
-      "15k": { cilindros: 0, masa: 0, conteoFisico: 0, progMasa: 0 },
-      "45k": { cilindros: 0, masa: 0, conteoFisico: 0, progMasa: 0 },
-      GH: { cilindros: 0, masa: 0, conteoFisico: 0, progMasa: 0 },
-    },
     sonSubsistemas: [],
   },
 ]
 
-// Funciones de cálculo para consistencia
-export const calculateNationalTotals = () => {
-  const totals = UNIFIED_DATA.reduce(
-    (acc, subsystem) => ({
-      materiaPrima: {
-        toneladas: acc.materiaPrima.toneladas + subsystem.materiaPrima.toneladas,
-        capacidad: acc.materiaPrima.capacidad + subsystem.materiaPrima.capacidad,
-      },
-      cilindros: {
-        total: acc.cilindros.total + subsystem.cilindros.total,
-        llenos: acc.cilindros.llenos + subsystem.cilindros.llenos,
-        vacios: acc.cilindros.vacios + subsystem.cilindros.vacios,
-        mantencion: acc.cilindros.mantencion + subsystem.cilindros.mantencion,
-        competencia: acc.cilindros.competencia + subsystem.cilindros.competencia,
-        operativos: acc.cilindros.operativos + subsystem.cilindros.operativos,
-      },
-      masa: {
-        totalMasa: acc.masa.totalMasa + subsystem.masa.totalMasa,
-        masaOperativa: acc.masa.masaOperativa + subsystem.masa.masaOperativa,
-        masaDisponible: acc.masa.masaDisponible + subsystem.masa.masaDisponible,
-        masaMantenimiento: acc.masa.masaMantenimiento + subsystem.masa.masaMantenimiento,
-      },
-    }),
+// Función para calcular toneladas por producto en cada subsistema
+export function calcularToneladasPorProducto(sub: SubsystemData): ProductoMateriaPrima[] {
+  return sub.materiaPrima.productos.map(p => ({
+    ...p,
+    toneladas: Math.round(sub.materiaPrima.toneladas * p.porcentaje)
+  }));
+}
+
+// Función para calcular totales nacionales de productos (incluyendo competencia)
+export function calculateNationalProducts(): ProductoMateriaPrima[] {
+  const productos: TipoProducto[] = ["Propano SC", "Propano", "Mezcla", "Butano", "Competencia"];
+  const totalToneladas = UNIFIED_DATA.reduce((acc, s) => acc + s.materiaPrima.toneladas, 0);
+  return productos.map(nombre => {
+    const toneladas = UNIFIED_DATA.reduce(
+      (acc, s) => acc + (s.materiaPrima.toneladas * (s.materiaPrima.productos.find(p => p.nombre === nombre)?.porcentaje || 0)),
+      0
+    );
+    return {
+      nombre,
+      porcentaje: totalToneladas > 0 ? toneladas / totalToneladas : 0,
+      toneladas,
+    };
+  });
+}
+
+// Función para calcular totales nacionales de cilindros por formato (incluyendo competencia)
+export function calculateNationalCylindersByFormat() {
+  const formatos: FormatoCilindro[] = ["5k", "11k", "15k", "45k", "GH"];
+  return formatos.map(formato => {
+    const cilindros = UNIFIED_DATA.reduce((acc, s) => acc + (s.cilindros.porFormato[formato]?.cilindros || 0), 0);
+    const competencia = UNIFIED_DATA.reduce((acc, s) => acc + (s.cilindros.porFormato[formato]?.competencia || 0), 0);
+    return { formato, cilindros, competencia };
+  });
+}
+
+// Función para calcular totales nacionales generales
+export function calculateNationalTotals() {
+  return UNIFIED_DATA.reduce(
+    (acc, s) => {
+      acc.materiaPrima.toneladas += s.materiaPrima.toneladas;
+      acc.materiaPrima.capacidad += s.materiaPrima.capacidad;
+      acc.cilindros.total += s.cilindros.total;
+      acc.cilindros.llenos += s.cilindros.llenos;
+      acc.cilindros.vacios += s.cilindros.vacios;
+      acc.cilindros.mantencion += s.cilindros.mantencion;
+      acc.cilindros.competencia += s.cilindros.competencia;
+      acc.cilindros.operativos += s.cilindros.operativos;
+      acc.masa.totalMasa += s.masa.totalMasa;
+      acc.masa.masaOperativa += s.masa.masaOperativa;
+      acc.masa.masaDisponible += s.masa.masaDisponible;
+      acc.masa.masaMantenimiento += s.masa.masaMantenimiento;
+      return acc;
+    },
     {
       materiaPrima: { toneladas: 0, capacidad: 0 },
       cilindros: { total: 0, llenos: 0, vacios: 0, mantencion: 0, competencia: 0, operativos: 0 },
       masa: { totalMasa: 0, masaOperativa: 0, masaDisponible: 0, masaMantenimiento: 0 },
-    },
-  )
-
-  return {
-    ...totals,
-    ocupacionNacional: Math.round((totals.materiaPrima.toneladas / totals.materiaPrima.capacidad) * 100),
-    eficienciaNacional: Math.round((totals.cilindros.operativos / totals.cilindros.total) * 100),
-    eficienciaMasa: Math.round((totals.masa.masaOperativa / totals.masa.totalMasa) * 100),
-  }
+    }
+  );
 }
-
-export const NATIONAL_TOTALS = calculateNationalTotals()
 
 // Datos adicionales para storytelling maestro
 export const MASTER_INSIGHTS = {
@@ -381,62 +423,62 @@ export const MASTER_INSIGHTS = {
       total: 131000,
     },
     stockSGP: {
-      llenos: NATIONAL_TOTALS.cilindros.llenos,
-      vacios: NATIONAL_TOTALS.cilindros.vacios,
-      mantencion: NATIONAL_TOTALS.cilindros.mantencion,
-      competencia: NATIONAL_TOTALS.cilindros.competencia,
-      total: NATIONAL_TOTALS.cilindros.total,
+      llenos: UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.llenos, 0),
+      vacios: UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.vacios, 0),
+      mantencion: UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.mantencion, 0),
+      competencia: UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.competencia, 0),
+      total: UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.total, 0),
     },
     differences: {
-      llenos: NATIONAL_TOTALS.cilindros.llenos - 66200,
-      vacios: NATIONAL_TOTALS.cilindros.vacios - 32800,
-      mantencion: NATIONAL_TOTALS.cilindros.mantencion - 18200,
-      competencia: NATIONAL_TOTALS.cilindros.competencia - 13800,
-      total: NATIONAL_TOTALS.cilindros.total - 131000,
+      llenos: UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.llenos, 0) - 66200,
+      vacios: UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.vacios, 0) - 32800,
+      mantencion: UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.mantencion, 0) - 18200,
+      competencia: UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.competencia, 0) - 13800,
+      total: UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.total, 0) - 131000,
     },
-    accuracyRate: Math.round(((131000 - Math.abs(NATIONAL_TOTALS.cilindros.total - 131000)) / 131000) * 100 * 10) / 10,
+    accuracyRate: Math.round(((131000 - Math.abs(UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.total, 0) - 131000)) / 131000) * 100 * 10) / 10,
   },
   
   // Distribución por tamaños para storytelling
   cilindrosBySize: {
     "5kg": { 
-      cantidad: 89100, 
-      porcentaje: 64.3, 
-      capacidadDisponible: 95000,
-      ocupacion: Math.round((89100 / 95000) * 100)
+      cantidad: UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.llenos, 0), 
+      porcentaje: Math.round((UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.llenos, 0) / UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.total, 0)) * 100), 
+      capacidadDisponible: UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.capacidad, 0),
+      ocupacion: Math.round((UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.llenos, 0) / UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.capacidad, 0)) * 100)
     },
     "11kg": { 
-      cantidad: 24900, 
-      porcentaje: 18.0, 
-      capacidadDisponible: 28000,
-      ocupacion: Math.round((24900 / 28000) * 100)
+      cantidad: UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.llenos, 0), 
+      porcentaje: Math.round((UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.llenos, 0) / UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.total, 0)) * 100), 
+      capacidadDisponible: UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.capacidad, 0),
+      ocupacion: Math.round((UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.llenos, 0) / UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.capacidad, 0)) * 100)
     },
     "15kg": { 
-      cantidad: 15500, 
-      porcentaje: 11.2, 
-      capacidadDisponible: 18000,
-      ocupacion: Math.round((15500 / 18000) * 100)
+      cantidad: UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.llenos, 0), 
+      porcentaje: Math.round((UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.llenos, 0) / UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.total, 0)) * 100), 
+      capacidadDisponible: UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.capacidad, 0),
+      ocupacion: Math.round((UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.llenos, 0) / UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.capacidad, 0)) * 100)
     },
     "45kg": { 
-      cantidad: 6200, 
-      porcentaje: 4.5, 
-      capacidadDisponible: 8000,
-      ocupacion: Math.round((6200 / 8000) * 100)
+      cantidad: UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.llenos, 0), 
+      porcentaje: Math.round((UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.llenos, 0) / UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.total, 0)) * 100), 
+      capacidadDisponible: UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.capacidad, 0),
+      ocupacion: Math.round((UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.llenos, 0) / UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.capacidad, 0)) * 100)
     },
     "GH": { 
-      cantidad: 2800, 
-      porcentaje: 2.0, 
-      capacidadDisponible: 4000,
-      ocupacion: Math.round((2800 / 4000) * 100)
+      cantidad: UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.llenos, 0), 
+      porcentaje: Math.round((UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.llenos, 0) / UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.total, 0)) * 100), 
+      capacidadDisponible: UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.capacidad, 0),
+      ocupacion: Math.round((UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.llenos, 0) / UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.capacidad, 0)) * 100)
     },
   },
   
   // KPIs críticos para performance
   criticalKPIs: {
     eficienciaMeta: 95,
-    gapEficiencia: 95 - NATIONAL_TOTALS.eficienciaNacional,
+    gapEficiencia: 95 - UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.operativos, 0) / UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.total, 0),
     subsistemaCritico: UNIFIED_DATA.filter(s => s.materiaPrima.estado === "inactivo").length,
-    cilindrosMantencionPct: Math.round((NATIONAL_TOTALS.cilindros.mantencion / NATIONAL_TOTALS.cilindros.total) * 100 * 10) / 10,
-    capacidadDisponible: NATIONAL_TOTALS.materiaPrima.capacidad - NATIONAL_TOTALS.materiaPrima.toneladas,
+    cilindrosMantencionPct: Math.round((UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.mantencion, 0) / UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.total, 0)) * 100 * 10) / 10,
+    capacidadDisponible: UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.capacidad, 0) - UNIFIED_DATA.reduce((acc, s) => acc + s.cilindros.total, 0),
   }
 }
