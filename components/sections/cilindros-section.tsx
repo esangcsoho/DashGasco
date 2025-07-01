@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { ChevronDown, ChevronRight, Eye } from "lucide-react"
-import { NATIONAL_TOTALS, UNIFIED_DATA } from "@/lib/data-model"
+import { calculateNationalTotals, UNIFIED_DATA } from "@/lib/data-model"
 import Image from "next/image"
 
 interface CilindrosSectionProps {
@@ -15,6 +15,7 @@ interface CilindrosSectionProps {
 }
 
 export function CilindrosSection({ showDetailTables, setShowDetailTables }: CilindrosSectionProps) {
+  const NATIONAL_TOTALS = calculateNationalTotals();
   // Datos calculados desde NATIONAL_TOTALS
   const totalCilindros = NATIONAL_TOTALS.cilindros.total
   const llenos = NATIONAL_TOTALS.cilindros.llenos
@@ -687,185 +688,183 @@ export function CilindrosSection({ showDetailTables, setShowDetailTables }: Cili
             {/* Tercera fila: 1 subsistema centrado */}
             <div className="flex justify-center">
               <div className="w-1/3">
-                {subsystemsData.slice(6, 7).map((subsistema, index) => (
-                  <Dialog key={index}>
-                    <DialogTrigger asChild>
-                      <div className="text-center p-4 border rounded-lg bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors">
-                        <div className="text-lg font-bold mb-3">{subsistema.total > 0 ? (subsistema.total / 1000).toFixed(1) + 'k' : '0'} cil</div>
-                        <div className="text-sm font-medium mb-2">{subsistema.nombre}</div>
-                        
-                        {subsistema.total > 0 ? (
-                          <>
-                            {/* Barra apilada */}
-                            <div className="flex mb-2 h-6 rounded overflow-hidden">
-                              <div 
-                                className="bg-blue-500 flex items-center justify-center text-white text-xs font-bold"
-                                style={{ width: `${(subsistema.llenos / subsistema.total) * 100}%` }}
-                              >
-                                {Math.round((subsistema.llenos / subsistema.total) * 100)}%
-                              </div>
-                              <div 
-                                className="bg-green-500 flex items-center justify-center text-white text-xs font-bold"
-                                style={{ width: `${(subsistema.vacios / subsistema.total) * 100}%` }}
-                              >
-                                {Math.round((subsistema.vacios / subsistema.total) * 100)}%
-                              </div>
-                              <div 
-                                className="bg-orange-500 flex items-center justify-center text-white text-xs font-bold"
-                                style={{ width: `${(subsistema.mantencion / subsistema.total) * 100}%` }}
-                              >
-                                {Math.round((subsistema.mantencion / subsistema.total) * 100)}%
-                              </div>
-                              <div 
-                                className="bg-purple-500 flex items-center justify-center text-white text-xs font-bold"
-                                style={{ width: `${(subsistema.competencia / subsistema.total) * 100}%` }}
-                              >
-                                {Math.round((subsistema.competencia / subsistema.total) * 100)}%
-                              </div>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <div className="text-center p-4 border rounded-lg bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors">
+                      <div className="text-lg font-bold mb-3">{subsystemsData.slice(6, 7)[0].total > 0 ? (subsystemsData.slice(6, 7)[0].total / 1000).toFixed(1) + 'k' : '0'} cil</div>
+                      <div className="text-sm font-medium mb-2">{subsystemsData.slice(6, 7)[0].nombre}</div>
+                      
+                      {subsystemsData.slice(6, 7)[0].total > 0 ? (
+                        <>
+                          {/* Barra apilada */}
+                          <div className="flex mb-2 h-6 rounded overflow-hidden">
+                            <div 
+                              className="bg-blue-500 flex items-center justify-center text-white text-xs font-bold"
+                              style={{ width: `${(subsystemsData.slice(6, 7)[0].llenos / subsystemsData.slice(6, 7)[0].total) * 100}%` }}
+                            >
+                              {Math.round((subsystemsData.slice(6, 7)[0].llenos / subsystemsData.slice(6, 7)[0].total) * 100)}%
                             </div>
-
-                            {/* Etiquetas */}
-                            <div className="grid grid-cols-4 gap-1 text-xs">
-                              <div className="text-blue-600 font-medium">Llenos</div>
-                              <div className="text-green-600 font-medium">Vacíos</div>
-                              <div className="text-orange-600 font-medium">Mant.</div>
-                              <div className="text-purple-600 font-medium">Comp.</div>
+                            <div 
+                              className="bg-green-500 flex items-center justify-center text-white text-xs font-bold"
+                              style={{ width: `${(subsystemsData.slice(6, 7)[0].vacios / subsystemsData.slice(6, 7)[0].total) * 100}%` }}
+                            >
+                              {Math.round((subsystemsData.slice(6, 7)[0].vacios / subsystemsData.slice(6, 7)[0].total) * 100)}%
                             </div>
-                            <div className="text-xs text-gray-500 mt-2">Click para detalle</div>
-                          </>
-                        ) : (
-                          <div className="text-gray-400 text-sm">Inactivo</div>
-                        )}
-                      </div>
-                    </DialogTrigger>
-                    
-                    {subsistema.total > 0 && (
-                      <DialogContent className="max-w-3xl">
-                        <DialogHeader>
-                          <DialogTitle>Detalle Completo - {subsistema.nombre}</DialogTitle>
-                        </DialogHeader>
-                        
-                        <div className="space-y-6">
-                          {/* Resumen del Subsistema */}
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className="p-4 bg-blue-50 rounded">
-                              <h4 className="font-bold mb-2">Información General</h4>
-                              <div className="space-y-1 text-sm">
-                                <div>Total: <span className="font-bold">{subsistema.total.toLocaleString()}</span> cilindros</div>
-                                <div>Ocupación: <span className="font-bold text-green-600">{((subsistema.llenos / subsistema.total) * 100).toFixed(1)}%</span></div>
-                                <div>Capacidad: <span className="font-bold">{Math.round(subsistema.total * 1.2).toLocaleString()}</span> cilindros</div>
-                              </div>
+                            <div 
+                              className="bg-orange-500 flex items-center justify-center text-white text-xs font-bold"
+                              style={{ width: `${(subsystemsData.slice(6, 7)[0].mantencion / subsystemsData.slice(6, 7)[0].total) * 100}%` }}
+                            >
+                              {Math.round((subsystemsData.slice(6, 7)[0].mantencion / subsystemsData.slice(6, 7)[0].total) * 100)}%
                             </div>
-                            
-                            <div className="p-4 bg-gray-50 rounded">
-                              <h4 className="font-bold mb-2">Distribución por Estado</h4>
-                              <div className="space-y-2">
-                                <div className="flex justify-between">
-                                  <span className="text-blue-600">Llenos:</span>
-                                  <span className="font-bold">{subsistema.llenos.toLocaleString()}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span className="text-green-600">Vacíos:</span>
-                                  <span className="font-bold">{subsistema.vacios.toLocaleString()}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span className="text-orange-600">Mantencion:</span>
-                                  <span className="font-bold">{subsistema.mantencion.toLocaleString()}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span className="text-purple-600">Competencia:</span>
-                                  <span className="font-bold">{subsistema.competencia.toLocaleString()}</span>
-                                </div>
-                              </div>
+                            <div 
+                              className="bg-purple-500 flex items-center justify-center text-white text-xs font-bold"
+                              style={{ width: `${(subsystemsData.slice(6, 7)[0].competencia / subsystemsData.slice(6, 7)[0].total) * 100}%` }}
+                            >
+                              {Math.round((subsystemsData.slice(6, 7)[0].competencia / subsystemsData.slice(6, 7)[0].total) * 100)}%
                             </div>
                           </div>
 
-                          {/* Desglose por Tamaño */}
-                          <div>
-                            <h4 className="font-bold mb-3">Distribución por Tamaño</h4>
-                            <div className="grid grid-cols-5 gap-3">
-                              <div className="text-center p-3 bg-blue-50 rounded">
-                                <div className="text-xs text-gray-600">5kg</div>
-                                <div className="font-bold">{Math.round(subsistema.total * 0.45).toLocaleString()}</div>
-                                <div className="text-xs">45%</div>
-                              </div>
-                              <div className="text-center p-3 bg-green-50 rounded">
-                                <div className="text-xs text-gray-600">11kg</div>
-                                <div className="font-bold">{Math.round(subsistema.total * 0.25).toLocaleString()}</div>
-                                <div className="text-xs">25%</div>
-                              </div>
-                              <div className="text-center p-3 bg-yellow-50 rounded">
-                                <div className="text-xs text-gray-600">15kg</div>
-                                <div className="font-bold">{Math.round(subsistema.total * 0.15).toLocaleString()}</div>
-                                <div className="text-xs">15%</div>
-                              </div>
-                              <div className="text-center p-3 bg-orange-50 rounded">
-                                <div className="text-xs text-gray-600">45kg</div>
-                                <div className="font-bold">{Math.round(subsistema.total * 0.10).toLocaleString()}</div>
-                                <div className="text-xs">10%</div>
-                              </div>
-                              <div className="text-center p-3 bg-purple-50 rounded">
-                                <div className="text-xs text-gray-600">GH</div>
-                                <div className="font-bold">{Math.round(subsistema.total * 0.05).toLocaleString()}</div>
-                                <div className="text-xs">5%</div>
-                              </div>
+                          {/* Etiquetas */}
+                          <div className="grid grid-cols-4 gap-1 text-xs">
+                            <div className="text-blue-600 font-medium">Llenos</div>
+                            <div className="text-green-600 font-medium">Vacíos</div>
+                            <div className="text-orange-600 font-medium">Mant.</div>
+                            <div className="text-purple-600 font-medium">Comp.</div>
+                          </div>
+                          <div className="text-xs text-gray-500 mt-2">Click para detalle</div>
+                        </>
+                      ) : (
+                        <div className="text-gray-400 text-sm">Inactivo</div>
+                      )}
+                    </div>
+                  </DialogTrigger>
+                  
+                  {subsystemsData.slice(6, 7)[0].total > 0 && (
+                    <DialogContent className="max-w-3xl">
+                      <DialogHeader>
+                        <DialogTitle>Detalle Completo - {subsystemsData.slice(6, 7)[0].nombre}</DialogTitle>
+                      </DialogHeader>
+                      
+                      <div className="space-y-6">
+                        {/* Resumen del Subsistema */}
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="p-4 bg-blue-50 rounded">
+                            <h4 className="font-bold mb-2">Información General</h4>
+                            <div className="space-y-1 text-sm">
+                              <div>Total: <span className="font-bold">{subsystemsData.slice(6, 7)[0].total.toLocaleString()}</span> cilindros</div>
+                              <div>Ocupación: <span className="font-bold text-green-600">{((subsystemsData.slice(6, 7)[0].llenos / subsystemsData.slice(6, 7)[0].total) * 100).toFixed(1)}%</span></div>
+                              <div>Capacidad: <span className="font-bold">{Math.round(subsystemsData.slice(6, 7)[0].total * 1.2).toLocaleString()}</span> cilindros</div>
                             </div>
                           </div>
-
-                          {/* Detalle de Mantencion */}
-                          <div>
-                            <h4 className="font-bold mb-3">Composición Mantencion</h4>
-                            <div className="grid grid-cols-4 gap-3">
-                              <div className="text-center p-2 bg-orange-50 rounded">
-                                <div className="text-xs text-gray-600">Revisión</div>
-                                <div className="font-bold">{Math.round(subsistema.mantencion * 0.3).toLocaleString()}</div>
+                          
+                          <div className="p-4 bg-gray-50 rounded">
+                            <h4 className="font-bold mb-2">Distribución por Estado</h4>
+                            <div className="space-y-2">
+                              <div className="flex justify-between">
+                                <span className="text-blue-600">Llenos:</span>
+                                <span className="font-bold">{subsystemsData.slice(6, 7)[0].llenos.toLocaleString()}</span>
                               </div>
-                              <div className="text-center p-2 bg-orange-50 rounded">
-                                <div className="text-xs text-gray-600">Reparación</div>
-                                <div className="font-bold">{Math.round(subsistema.mantencion * 0.25).toLocaleString()}</div>
+                              <div className="flex justify-between">
+                                <span className="text-green-600">Vacíos:</span>
+                                <span className="font-bold">{subsystemsData.slice(6, 7)[0].vacios.toLocaleString()}</span>
                               </div>
-                              <div className="text-center p-2 bg-orange-50 rounded">
-                                <div className="text-xs text-gray-600">Pintura</div>
-                                <div className="font-bold">{Math.round(subsistema.mantencion * 0.25).toLocaleString()}</div>
+                              <div className="flex justify-between">
+                                <span className="text-orange-600">Mantencion:</span>
+                                <span className="font-bold">{subsystemsData.slice(6, 7)[0].mantencion.toLocaleString()}</span>
                               </div>
-                              <div className="text-center p-2 bg-orange-50 rounded">
-                                <div className="text-xs text-gray-600">Válvulas</div>
-                                <div className="font-bold">{Math.round(subsistema.mantencion * 0.2).toLocaleString()}</div>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Detalle de Competencia */}
-                          <div>
-                            <h4 className="font-bold mb-3">Composición Competencia</h4>
-                            <div className="grid grid-cols-4 gap-3">
-                              <div className="text-center p-2 bg-purple-50 rounded">
-                                <div className="text-xs text-gray-600">Lipigas</div>
-                                <div className="font-bold">{Math.round(subsistema.competencia * 0.4).toLocaleString()}</div>
-                                <div className="text-xs">40%</div>
-                              </div>
-                              <div className="text-center p-2 bg-purple-50 rounded">
-                                <div className="text-xs text-gray-600">Gasco</div>
-                                <div className="font-bold">{Math.round(subsistema.competencia * 0.3).toLocaleString()}</div>
-                                <div className="text-xs">30%</div>
-                              </div>
-                              <div className="text-center p-2 bg-purple-50 rounded">
-                                <div className="text-xs text-gray-600">Abastible</div>
-                                <div className="font-bold">{Math.round(subsistema.competencia * 0.2).toLocaleString()}</div>
-                                <div className="text-xs">20%</div>
-                              </div>
-                              <div className="text-center p-2 bg-purple-50 rounded">
-                                <div className="text-xs text-gray-600">Otros</div>
-                                <div className="font-bold">{Math.round(subsistema.competencia * 0.1).toLocaleString()}</div>
-                                <div className="text-xs">10%</div>
+                              <div className="flex justify-between">
+                                <span className="text-purple-600">Competencia:</span>
+                                <span className="font-bold">{subsystemsData.slice(6, 7)[0].competencia.toLocaleString()}</span>
                               </div>
                             </div>
                           </div>
                         </div>
-                      </DialogContent>
-                    )}
-                  </Dialog>
-                ))}
+
+                        {/* Desglose por Tamaño */}
+                        <div>
+                          <h4 className="font-bold mb-3">Distribución por Tamaño</h4>
+                          <div className="grid grid-cols-5 gap-3">
+                            <div className="text-center p-3 bg-blue-50 rounded">
+                              <div className="text-xs text-gray-600">5kg</div>
+                              <div className="font-bold">{Math.round(subsystemsData.slice(6, 7)[0].total * 0.45).toLocaleString()}</div>
+                              <div className="text-xs">45%</div>
+                            </div>
+                            <div className="text-center p-3 bg-green-50 rounded">
+                              <div className="text-xs text-gray-600">11kg</div>
+                              <div className="font-bold">{Math.round(subsystemsData.slice(6, 7)[0].total * 0.25).toLocaleString()}</div>
+                              <div className="text-xs">25%</div>
+                            </div>
+                            <div className="text-center p-3 bg-yellow-50 rounded">
+                              <div className="text-xs text-gray-600">15kg</div>
+                              <div className="font-bold">{Math.round(subsystemsData.slice(6, 7)[0].total * 0.15).toLocaleString()}</div>
+                              <div className="text-xs">15%</div>
+                            </div>
+                            <div className="text-center p-3 bg-orange-50 rounded">
+                              <div className="text-xs text-gray-600">45kg</div>
+                              <div className="font-bold">{Math.round(subsystemsData.slice(6, 7)[0].total * 0.10).toLocaleString()}</div>
+                              <div className="text-xs">10%</div>
+                            </div>
+                            <div className="text-center p-3 bg-purple-50 rounded">
+                              <div className="text-xs text-gray-600">GH</div>
+                              <div className="font-bold">{Math.round(subsystemsData.slice(6, 7)[0].total * 0.05).toLocaleString()}</div>
+                              <div className="text-xs">5%</div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Detalle de Mantencion */}
+                        <div>
+                          <h4 className="font-bold mb-3">Composición Mantencion</h4>
+                          <div className="grid grid-cols-4 gap-3">
+                            <div className="text-center p-2 bg-orange-50 rounded">
+                              <div className="text-xs text-gray-600">Revisión</div>
+                              <div className="font-bold">{Math.round(subsystemsData.slice(6, 7)[0].mantencion * 0.3).toLocaleString()}</div>
+                            </div>
+                            <div className="text-center p-2 bg-orange-50 rounded">
+                              <div className="text-xs text-gray-600">Reparación</div>
+                              <div className="font-bold">{Math.round(subsystemsData.slice(6, 7)[0].mantencion * 0.25).toLocaleString()}</div>
+                            </div>
+                            <div className="text-center p-2 bg-orange-50 rounded">
+                              <div className="text-xs text-gray-600">Pintura</div>
+                              <div className="font-bold">{Math.round(subsystemsData.slice(6, 7)[0].mantencion * 0.25).toLocaleString()}</div>
+                            </div>
+                            <div className="text-center p-2 bg-orange-50 rounded">
+                              <div className="text-xs text-gray-600">Válvulas</div>
+                              <div className="font-bold">{Math.round(subsystemsData.slice(6, 7)[0].mantencion * 0.2).toLocaleString()}</div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Detalle de Competencia */}
+                        <div>
+                          <h4 className="font-bold mb-3">Composición Competencia</h4>
+                          <div className="grid grid-cols-4 gap-3">
+                            <div className="text-center p-2 bg-purple-50 rounded">
+                              <div className="text-xs text-gray-600">Lipigas</div>
+                              <div className="font-bold">{Math.round(subsystemsData.slice(6, 7)[0].competencia * 0.4).toLocaleString()}</div>
+                              <div className="text-xs">40%</div>
+                            </div>
+                            <div className="text-center p-2 bg-purple-50 rounded">
+                              <div className="text-xs text-gray-600">Gasco</div>
+                              <div className="font-bold">{Math.round(subsystemsData.slice(6, 7)[0].competencia * 0.3).toLocaleString()}</div>
+                              <div className="text-xs">30%</div>
+                            </div>
+                            <div className="text-center p-2 bg-purple-50 rounded">
+                              <div className="text-xs text-gray-600">Abastible</div>
+                              <div className="font-bold">{Math.round(subsystemsData.slice(6, 7)[0].competencia * 0.2).toLocaleString()}</div>
+                              <div className="text-xs">20%</div>
+                            </div>
+                            <div className="text-center p-2 bg-purple-50 rounded">
+                              <div className="text-xs text-gray-600">Otros</div>
+                              <div className="font-bold">{Math.round(subsystemsData.slice(6, 7)[0].competencia * 0.1).toLocaleString()}</div>
+                              <div className="text-xs">10%</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </DialogContent>
+                  )}
+                </Dialog>
               </div>
             </div>
           </div>

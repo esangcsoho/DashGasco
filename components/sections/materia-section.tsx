@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from "@/components/ui/button"
 import { TremorCard, TremorMetric } from "../ui/tremor-card"
 import { CircularProgress } from "../ui/tremor-progress"
-import { UNIFIED_DATA, NATIONAL_TOTALS, MASTER_INSIGHTS } from "@/lib/data-model"
+import { UNIFIED_DATA, calculateNationalTotals, MASTER_INSIGHTS, calculateNationalProducts } from "@/lib/data-model"
 import { Factory, Gauge, Package2, Map, AlertTriangle } from "lucide-react"
 import Image from "next/image"
 import { Table, TableHeader, TableHead, TableBody, TableCell, TableRow } from "@/components/ui/table"
@@ -37,6 +37,7 @@ export function MateriaSection({
   getStatusColor 
 }: MateriaSectionProps) {
   const [selectedSubsystem, setSelectedSubsystem] = useState<any>(null)
+  const NATIONAL_TOTALS = calculateNationalTotals();
 
   return (
     <div className="space-y-6">
@@ -53,7 +54,7 @@ export function MateriaSection({
         <Card className="text-center">
           <CardContent className="p-6">
             <div className="text-sm text-gray-600 mb-2">Materia Prima SGP</div>
-            <div className="text-3xl font-bold text-blue-600">{NATIONAL_TOTALS.materiaPrima.toneladas.toLocaleString()}</div>
+            <div className="text-3xl font-bold text-blue-600">{(NATIONAL_TOTALS.materiaPrima.toneladas ?? 0).toLocaleString()}</div>
             <div className="text-sm text-blue-600">ton</div>
           </CardContent>
         </Card>
@@ -71,7 +72,7 @@ export function MateriaSection({
             <div className="text-sm text-gray-600 mb-2">Diferencia SGP vs SAP</div>
             <div className="text-3xl font-bold text-green-600">+13.64%</div>
             <div className="text-sm text-green-600">Porcentaje</div>
-            <div className="text-xs text-gray-500 mt-1">Ocupación: {NATIONAL_TOTALS.ocupacionNacional}%</div>
+            <div className="text-xs text-gray-500 mt-1">Ocupación: {nationalOverview.ocupacionPromedio}%</div>
           </CardContent>
         </Card>
       </div>
@@ -201,35 +202,24 @@ export function MateriaSection({
           <CardContent>
             {/* Resumen de productos por toneladas */}
             <div className="space-y-4 mb-6">
-              <div className="text-center p-3 bg-blue-50 rounded">
-                <div className="text-sm text-gray-600">Primavera GLP</div>
-                <div className="text-2xl font-bold text-blue-600">{(NATIONAL_TOTALS.materiaPrima.toneladas * 0.304).toFixed(0)}</div>
-                <div className="text-xs text-gray-500">30.4% • +{Math.round((NATIONAL_TOTALS.materiaPrima.toneladas * 0.304 * 0.07))} ton</div>
-              </div>
-
-              <div className="text-center p-3 bg-cyan-50 rounded">
-                <div className="text-sm text-gray-600">Lipigas</div>
-                <div className="text-2xl font-bold text-cyan-600">{(NATIONAL_TOTALS.materiaPrima.toneladas * 0.280).toFixed(0)}</div>
-                <div className="text-xs text-gray-500">28.0% • -{Math.round((NATIONAL_TOTALS.materiaPrima.toneladas * 0.280 * 0.01))} ton</div>
-              </div>
-
-              <div className="text-center p-3 bg-purple-50 rounded">
-                <div className="text-sm text-gray-600">Propano</div>
-                <div className="text-2xl font-bold text-purple-600">{(NATIONAL_TOTALS.materiaPrima.toneladas * 0.209).toFixed(0)}</div>
-                <div className="text-xs text-gray-500">20.9% • +{Math.round((NATIONAL_TOTALS.materiaPrima.toneladas * 0.209 * 0.07))} ton</div>
-              </div>
-
-              <div className="text-center p-3 bg-red-50 rounded">
-                <div className="text-sm text-gray-600">Mixto</div>
-                <div className="text-2xl font-bold text-red-600">{(NATIONAL_TOTALS.materiaPrima.toneladas * 0.107).toFixed(0)}</div>
-                <div className="text-xs text-gray-500">10.7% • -{Math.round((NATIONAL_TOTALS.materiaPrima.toneladas * 0.107 * 0.09))} ton</div>
-              </div>
-
-              <div className="text-center p-3 bg-orange-50 rounded">
-                <div className="text-sm text-gray-600">Butano</div>
-                <div className="text-2xl font-bold text-orange-600">{(NATIONAL_TOTALS.materiaPrima.toneladas * 0.100).toFixed(0)}</div>
-                <div className="text-xs text-gray-500">10.0% • +{Math.round((NATIONAL_TOTALS.materiaPrima.toneladas * 0.100 * 0.02))} ton</div>
-              </div>
+              {calculateNationalProducts().map((prod) => {
+                // Colores por producto
+                const colorMap: Record<string, string> = {
+                  "Propano SC": "blue",
+                  "Propano": "cyan",
+                  "Mezcla": "purple",
+                  "Butano": "orange",
+                };
+                return (
+                  <div key={prod.nombre} className={`text-center p-3 bg-${colorMap[prod.nombre]}-50 rounded`}>
+                    <div className="text-sm text-gray-600">{prod.nombre}</div>
+                    <div className={`text-2xl font-bold text-${colorMap[prod.nombre]}-600`}>
+                      {(prod.toneladas ?? 0).toLocaleString()}
+                    </div>
+                    <div className="text-xs text-gray-500">{((prod.porcentaje ?? 0) * 100).toFixed(1)}%</div>
+                  </div>
+                );
+              })}
             </div>
 
             {/* Tabla de datos debajo */}
@@ -244,41 +234,27 @@ export function MateriaSection({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                <TableRow>
-                  <TableCell className="font-medium">Primavera GLP</TableCell>
-                  <TableCell className="text-center">{(NATIONAL_TOTALS.materiaPrima.toneladas * 0.304).toFixed(0)}</TableCell>
-                  <TableCell className="text-center">{(NATIONAL_TOTALS.materiaPrima.toneladas * 0.304 * 0.93).toFixed(0)}</TableCell>
-                  <TableCell className="text-center text-green-600 font-bold">+{(NATIONAL_TOTALS.materiaPrima.toneladas * 0.304 * 0.07).toFixed(0)}</TableCell>
-                  <TableCell className="text-center">30.4%</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">Lipigas</TableCell>
-                  <TableCell className="text-center">{(NATIONAL_TOTALS.materiaPrima.toneladas * 0.280).toFixed(0)}</TableCell>
-                  <TableCell className="text-center">{(NATIONAL_TOTALS.materiaPrima.toneladas * 0.280 * 1.01).toFixed(0)}</TableCell>
-                  <TableCell className="text-center text-red-600 font-bold">-{(NATIONAL_TOTALS.materiaPrima.toneladas * 0.280 * 0.01).toFixed(0)}</TableCell>
-                  <TableCell className="text-center">28.0%</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">Propano</TableCell>
-                  <TableCell className="text-center">{(NATIONAL_TOTALS.materiaPrima.toneladas * 0.209).toFixed(0)}</TableCell>
-                  <TableCell className="text-center">{(NATIONAL_TOTALS.materiaPrima.toneladas * 0.209 * 0.93).toFixed(0)}</TableCell>
-                  <TableCell className="text-center text-green-600 font-bold">+{(NATIONAL_TOTALS.materiaPrima.toneladas * 0.209 * 0.07).toFixed(0)}</TableCell>
-                  <TableCell className="text-center">20.9%</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">Mixto</TableCell>
-                  <TableCell className="text-center">{(NATIONAL_TOTALS.materiaPrima.toneladas * 0.107).toFixed(0)}</TableCell>
-                  <TableCell className="text-center">{(NATIONAL_TOTALS.materiaPrima.toneladas * 0.107 * 1.09).toFixed(0)}</TableCell>
-                  <TableCell className="text-center text-red-600 font-bold">-{(NATIONAL_TOTALS.materiaPrima.toneladas * 0.107 * 0.09).toFixed(0)}</TableCell>
-                  <TableCell className="text-center">10.7%</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">Butano</TableCell>
-                  <TableCell className="text-center">{(NATIONAL_TOTALS.materiaPrima.toneladas * 0.100).toFixed(0)}</TableCell>
-                  <TableCell className="text-center">{(NATIONAL_TOTALS.materiaPrima.toneladas * 0.100 * 0.98).toFixed(0)}</TableCell>
-                  <TableCell className="text-center text-green-600 font-bold">+{(NATIONAL_TOTALS.materiaPrima.toneladas * 0.100 * 0.02).toFixed(0)}</TableCell>
-                  <TableCell className="text-center">10.0%</TableCell>
-                </TableRow>
+                {calculateNationalProducts().map((prod) => {
+                  // Simulación: SAP es 95% del SGP para demo, puedes ajustar según lógica real
+                  const toneladas = prod.toneladas ?? 0;
+                  const stockSAP = Math.round(toneladas * 0.95);
+                  const diferencia = toneladas - stockSAP;
+                  const colorMap: Record<string, string> = {
+                    "Propano SC": "blue",
+                    "Propano": "cyan",
+                    "Mezcla": "purple",
+                    "Butano": "orange",
+                  };
+                  return (
+                    <TableRow key={prod.nombre}>
+                      <TableCell className="font-medium">{prod.nombre}</TableCell>
+                      <TableCell className="text-center">{toneladas.toLocaleString()}</TableCell>
+                      <TableCell className="text-center">{stockSAP.toLocaleString()}</TableCell>
+                      <TableCell className={`text-center font-bold ${diferencia >= 0 ? 'text-green-600' : 'text-red-600'}`}>{diferencia >= 0 ? '+' : ''}{diferencia.toLocaleString()}</TableCell>
+                      <TableCell className="text-center">{((prod.porcentaje ?? 0) * 100).toFixed(1)}%</TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </CardContent>

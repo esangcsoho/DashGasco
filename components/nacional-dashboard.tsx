@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { ArrowRight, Map, BarChart3, Activity, Gauge } from "lucide-react"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { TremorToggle } from "./ui/tremor-toggle"
-import { UNIFIED_DATA, NATIONAL_TOTALS } from "@/lib/data-model"
+import { UNIFIED_DATA, calculateNationalTotals } from "@/lib/data-model"
 import Image from "next/image"
 
 // Importar las secciones modulares
@@ -21,6 +21,9 @@ export function NacionalDashboard() {
   const [realTimeData, setRealTimeData] = useState(false)
   const [showDetailTables, setShowDetailTables] = useState(false)
 
+  // Calcular los totales nacionales usando la función del data model
+  const NATIONAL_TOTALS = useMemo(() => calculateNationalTotals(), []);
+
   // Datos nacionales consolidados
   const nationalOverview = useMemo(() => ({
     totalSubsistemas: UNIFIED_DATA.length,
@@ -31,7 +34,7 @@ export function NacionalDashboard() {
     masaOperativa: NATIONAL_TOTALS.masa.masaOperativa,
     ocupacionPromedio: Math.round((NATIONAL_TOTALS.materiaPrima.toneladas / NATIONAL_TOTALS.materiaPrima.capacidad) * 100),
     eficienciaOperacional: Math.round((NATIONAL_TOTALS.cilindros.operativos / NATIONAL_TOTALS.cilindros.total) * 100),
-  }), [])
+  }), [NATIONAL_TOTALS])
 
   // Datos comparativos SGP vs SAP consolidados a nivel nacional
   const comparativoSGPvsSAP = useMemo(() => ({
